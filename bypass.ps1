@@ -162,14 +162,10 @@ function Start-Sysprep {
 
 Assert-Elevation
 
-# Windows PowerShell 5.1 can still default to TLS 1.0 on some images, which
-# raw.githubusercontent.com refuses.
-try {
-    [Net.ServicePointManager]::SecurityProtocol =
-        [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
-} catch {
-    Write-Verbose "Could not raise the TLS version: $($_.Exception.Message)"
-}
+# No TLS version is pinned here on purpose. Windows 11 (the only supported
+# target) already negotiates TLS 1.2/1.3 through SystemDefault, and hardcoding
+# a version stops the OS handing us a better protocol later. Pinning is only
+# needed on Windows 7/8.1-era images, which this script does not support.
 
 if (-not $Force) {
     Write-Host ""
