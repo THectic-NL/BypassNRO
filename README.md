@@ -19,17 +19,23 @@ Run from an elevated prompt. During OOBE, **Shift+F10** gives you one.
 | **`unattend.xml` / `autounattend.xml`** (this project) | **Works** | Part of Windows' supported deployment tooling. Microsoft cannot remove it without breaking enterprise imaging, Autopilot and MDT/SCCM. |
 | **Rufus** ("Remove requirement for an online Microsoft account") | **Works** | Rufus patches the install media rather than using an OOBE trick, so it is unaffected by the OOBE changes. |
 | **Domain join** — "Set up for work or school" → "Sign-in options" → "Domain join instead" | **Works on Pro/Enterprise** | Not available on Home. Microsoft has been narrowing this path, so treat it as a fallback. |
-| **`start ms-cxh:localonly`** | **Blocked** | Blocked from Insider build 26220.6772 (6 October 2025) and since rolled into stable. |
+| **`start ms-cxh:localonly`** | **Blocked on Insider; retail unconfirmed** | Blocked in Insider Dev 26220.6772 / Beta 26120.6772 (6 October 2025). Whether that block has reached the retail 25H2 branch (26200.x) has **not** been re-tested for this repo — check your own image before relying on it either way. |
 | **`oobe\bypassnro`** | **Removed** | The script was deleted from the image in March 2025. |
 | **`BypassNRO` registry value** | **Build-dependent** | `reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t REG_DWORD /d 1 /f` re-enables the flow, but only on builds where the underlying code is still present. Unreliable on current builds. |
 
 **Timeline**
 
 - **March 2025** — `oobe\bypassnro` removed from Windows 11 24H2/25H2.
-- **6 October 2025** — `ms-cxh:localonly` blocked in Insider build 26220.6772, then in stable.
+- **6 October 2025** — `ms-cxh:localonly` blocked in Insider builds Dev 26220.6772 and Beta 26120.6772.
 - **August 2026** — answer files, Rufus and (on Pro) domain join still reach a local account. No single console command works on every image any more.
 
-Microsoft keeps changing this. If something here stops working, open an issue.
+### How current is this table?
+
+The answer-file route is the only row verified against this repo's own code. The
+rest is compiled from public reporting, not from a test run on each build, and
+Microsoft changes this often enough that a row can go stale between releases.
+Treat the console-command rows as "last known state", not as a guarantee, and
+open an issue if your image behaves differently.
 
 ---
 

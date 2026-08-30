@@ -29,15 +29,16 @@
     Run Sysprep with /shutdown instead of /reboot.
 
 .EXAMPLE
-    iex (irm bypassnro.stensel.nl)
+    & ([scriptblock]::Create((irm bypassnro.stensel.nl)))
 
     Run from an elevated prompt (Shift+F10 during OOBE gives you one).
+    See the README for the shorter pipe-to-execute one-liner.
 
 .EXAMPLE
     & ([scriptblock]::Create((irm bypassnro.stensel.nl))) -Force
 
-    Same, without the confirmation prompt. `iex` cannot pass parameters, so use
-    a script block when you need them.
+    Same, without the confirmation prompt. The short one-liner form cannot pass
+    parameters, so use a script block when you need them.
 
 .NOTES
     Requires elevation. Designed for Windows PowerShell 5.1, which is what
