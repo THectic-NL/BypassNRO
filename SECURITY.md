@@ -1,35 +1,17 @@
-# Security Policy
+## Reporting a Vulnerability
 
-## Supported versions
+**Do not open a public GitHub issue for security vulnerabilities.**
 
-Only the `main` branch is supported. Use the current version of `bypass.ps1`
-and `unattend.xml`.
+Report privately via [GitHub Security Advisories](https://github.com/Stensel8/bypassnro/security/advisories/new).
 
-## Reporting a vulnerability
+Include:
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Suggested fix (if any)
 
-Report vulnerabilities privately through
-[GitHub Security Advisories](https://github.com/Stensel8/bypassnro/security/advisories/new).
+You will receive a response within 7 days. If the report is accepted, a fix will be released as soon as possible and you will be credited in the release notes.
 
-Please do not open a public issue for a security problem.
+### Out of scope
 
-## Scope
-
-This project writes a Windows answer file and runs Sysprep. Things worth
-reporting:
-
-- A way to make `bypass.ps1` fetch or execute content from somewhere other
-  than the configured `UnattendUrl`.
-- A flaw that leaves the answer file (which contains plaintext passwords) on
-  disk after first logon.
-- Anything that grants more privilege than the documented behaviour.
-
-## Known and intended behaviour
-
-These are documented trade-offs, not vulnerabilities:
-
-- `unattend.xml` creates the `Admin` and `User` accounts **without a
-  password**, and signs `Admin` in automatically once. This is what makes the
-  bypass work. Set a password immediately after first logon.
-- The one-liner (`iex (irm bypassnro.stensel.nl)`) downloads and executes a
-  remote script. Read `bypass.ps1` before running it if that matters to you.
-- Sysprep reboots the machine and sends it back through OOBE.
+By design, `unattend.xml` creates accounts without a password and auto-logs in once, and the one-liner downloads and runs a remote script. These are documented in the README, not vulnerabilities.
