@@ -4,12 +4,13 @@
     "config:recommended"
   ],
   "timezone": "Europe/Amsterdam",
-  "forkProcessing": "enabled",
+  "forkProcessing": "disabled",
   "pinDigests": true,
   "assigneesFromCodeOwners": true,
   "reviewersFromCodeOwners": true,
   "enabledManagers": [
-    "github-actions"
+    "github-actions",
+    "npm"
   ],
   "labels": [
     "dependencies"

@@ -1,0 +1,18 @@
+name: PR title
+
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+
+permissions: {}
+
+jobs:
+  check:
+    name: Check PR title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check title contains issue reference
+        if: ${{ !contains(github.event.pull_request.title, '#') }}
+        run: |
+          echo "::error title=PR title must contain issue number (e.g., '#123')::PR title must reference an issue"
+          exit 1

@@ -1,0 +1,83 @@
+name: Deploy to Bunny.net
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'content/**'
+      - 'hugo.toml'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: "deploy"
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+
+      - name: Install Hugo
+        run: |
+          wget -O "${{ runner.temp }}/hugo.deb" \
+            "https://github.com/gohugoio/hugo/releases/download/v0.165.0/hugo_extended_0.165.0_linux-amd64.deb" \
+          && sudo dpkg -i "${{ runner.temp }}/hugo.deb"
+
+      - name: Download modules
+        run: hugo mod get -u
+
+      - name: Build with Hugo
+        env:
+          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+          HUGO_ENVIRONMENT: production
+          TZ: Europe/Amsterdam
+        run: |
+          hugo \
+            --gc \
+            --minify \
+            --baseURL "https://bypassnro.thectic.nl/"
+
+      - name: Upload to Bunny Storage
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BUNNY_STORAGE_ZONE }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BUNNY_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: de
+          STORAGE_ZONE: ${{ secrets.BUNNY_STORAGE_ZONE }}
+          STORAGE_ENDPOINT: ${{ secrets.BUNNY_STORAGE_ENDPOINT }}
+        run: |
+          aws s3 sync public/ "s3://${STORAGE_ZONE}/" \
+            --endpoint-url "${STORAGE_ENDPOINT}" \
+            --delete \
+            --no-progress
+
+      - name: Wait for storage replication
+        run: sleep 15
+
+      - name: Purge Bunny Pull Zone cache
+        env:
+          PULL_ZONE_ID: ${{ secrets.BUNNY_PULL_ZONE_ID }}
+          API_KEY: ${{ secrets.BUNNY_API_KEY }}
+        run: |
+          curl -sS --fail-with-body -X POST \
+            "https://api.bunny.net/pullzone/${PULL_ZONE_ID}/purgeCache" \
+            -H "AccessKey: ${API_KEY}" \
+            -H "Content-Type: application/json"

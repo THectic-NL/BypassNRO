@@ -1,0 +1,58 @@
+baseURL = 'https://bypassnro.thectic.nl/'
+title = 'BypassNRO'
+defaultContentLanguage = 'en'
+locale = 'en-US'
+enableRobotsTXT = true
+disableKinds = ['taxonomy', 'term', 'RSS']
+disableHugoGeneratorInject = true
+
+[languages]
+  [languages.en]
+    label = 'English'
+    weight = 1
+    title = 'BypassNRO'
+
+[menu]
+  [[menu.main]]
+    name = 'GitHub'
+    weight = 1
+    url = 'https://github.com/Thectic-NL/BypassNRO'
+    [menu.main.params]
+      icon = 'github'
+
+[params]
+  description = 'Windows OOBE bypass using Sysprep and unattend.xml — a reliable method that still works'
+  copyright = 'THectic'
+
+  [params.navbar]
+    displayTitle = true
+    displayLogo = false
+    width = 'wide'
+
+  [params.theme]
+    default = 'system'
+    displayToggle = false
+
+  [params.footer]
+    enable = true
+    displayCopyright = false
+    displayPoweredBy = false
+    width = 'normal'
+
+  displayUpdatedDate = true
+  dateFormat = 'January 2, 2006'
+
+  [params.editURL]
+    enable = false
+
+  [params.page]
+    width = 'wide'
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[module]
+  [[module.imports]]
+    path = "github.com/imfing/hextra"
