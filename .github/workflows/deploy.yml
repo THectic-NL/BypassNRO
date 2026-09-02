@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - 'content/**'
+      - 'static/**'
       - 'hugo.toml'
       - 'go.mod'
       - 'go.sum'

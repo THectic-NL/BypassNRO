@@ -21,7 +21,7 @@ disableHugoGeneratorInject = true
       icon = 'github'
 
 [params]
-  description = 'Windows OOBE bypass using Sysprep and unattend.xml — a reliable method that still works'
+  description = 'Windows OOBE bypass using Sysprep and unattend.xml; a reliable method that still works'
   copyright = 'THectic'
 
   [params.navbar]

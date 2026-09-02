@@ -11,12 +11,12 @@ toc: false
 
 <div class="hx-mb-12">
 {{< hextra/hero-subtitle >}}
-  Windows OOBE bypass using Sysprep and unattend.xml — a reliable method that still works
+  Windows OOBE bypass using Sysprep and unattend.xml; a reliable method that still works
 {{< /hextra/hero-subtitle >}}
 </div>
 
-<div class="hx-mb-6">
-{{< hextra/hero-badge link="https://raw.githubusercontent.com/Thectic-NL/BypassNRO/main/bypass.ps1" >}}
+<div class="hx-mb-10" style="margin-top: 2.5rem !important;">
+{{< hextra/hero-badge link="https://bypassnro.thectic.nl/bypass.ps1" >}}
   <span>Download script</span>
   {{< icon name="download" attributes="height=20" >}}
 {{< /hextra/hero-badge >}}
@@ -46,18 +46,18 @@ Press **Shift+F10** during Windows OOBE (Out of Box Experience) and run:
 
 ### PowerShell
 ```powershell
-iex(irm bypassnro.thectic.nl)
+iex(irm bypassnro.thectic.nl/bypass.ps1)
 ```
 
 ### With parameters
 ```powershell
-& ([scriptblock]::Create((irm bypassnro.thectic.nl))) -Force      # skip confirmation
-& ([scriptblock]::Create((irm bypassnro.thectic.nl))) -NoReboot   # shut down instead
+& ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1))) -Force      # skip confirmation
+& ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1))) -NoReboot   # shut down instead
 ```
 
 ## Without Sysprep (faster)
 
-Save [`unattend.xml`](https://raw.githubusercontent.com/Thectic-NL/BypassNRO/main/unattend.xml) to the root of the Windows 11 USB as `autounattend.xml`. Setup reads it during installation, so OOBE never asks for an account and there is no second reboot.
+Save [`unattend.xml`](https://bypassnro.thectic.nl/unattend.xml) to the root of the Windows 11 USB as `autounattend.xml`. Setup reads it during installation, so OOBE never asks for an account and there is no second reboot.
 
 ## Accounts
 
