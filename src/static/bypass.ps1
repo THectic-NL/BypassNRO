@@ -29,13 +29,13 @@
     Run Sysprep with /shutdown instead of /reboot.
 
 .EXAMPLE
-    & ([scriptblock]::Create((irm bypassnro.stensel.nl)))
+    & ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1)))
 
     Run from an elevated prompt (Shift+F10 during OOBE gives you one).
     See the README for the shorter pipe-to-execute one-liner.
 
 .EXAMPLE
-    & ([scriptblock]::Create((irm bypassnro.stensel.nl))) -Force
+    & ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1))) -Force
 
     Same, without the confirmation prompt. The short one-liner form cannot pass
     parameters, so use a script block when you need them.
@@ -52,7 +52,7 @@
 
 [CmdletBinding()]
 param(
-    [string]$UnattendUrl = 'https://raw.githubusercontent.com/Stensel8/bypassnro/main/unattend.xml',
+    [string]$UnattendUrl = 'https://bypassnro.thectic.nl/unattend.xml',
     [string]$Destination = 'C:\Windows\Panther\unattend.xml',
     [switch]$Force,
     [switch]$NoReboot

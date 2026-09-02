@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  BypassNRO answer file - https://github.com/Stensel8/bypassnro
+  BypassNRO answer file - https://github.com/Thectic-NL/BypassNRO
 
   Creates local accounts and skips the Microsoft-account sign-in screens
   during OOBE. Works two ways:

@@ -1,7 +1,6 @@
 baseURL = 'https://bypassnro.thectic.nl/'
 title = 'BypassNRO'
 defaultContentLanguage = 'en'
-locale = 'en-US'
 enableRobotsTXT = true
 disableKinds = ['taxonomy', 'term', 'RSS']
 disableHugoGeneratorInject = true
@@ -11,6 +10,12 @@ disableHugoGeneratorInject = true
     label = 'English'
     weight = 1
     title = 'BypassNRO'
+    locale = 'en-US'
+  [languages.nl]
+    label = 'Nederlands'
+    weight = 2
+    title = 'BypassNRO'
+    locale = 'nl-NL'
 
 [menu]
   [[menu.main]]
@@ -19,6 +24,16 @@ disableHugoGeneratorInject = true
     url = 'https://github.com/Thectic-NL/BypassNRO'
     [menu.main.params]
       icon = 'github'
+  [[menu.main]]
+    name = 'Language'
+    weight = 2
+    [menu.main.params]
+      type = 'language-switch'
+  [[menu.main]]
+    name = 'Theme'
+    weight = 3
+    [menu.main.params]
+      type = 'theme-toggle'
 
 [params]
   description = 'Windows OOBE bypass using Sysprep and unattend.xml; a reliable method that still works'

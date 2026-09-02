@@ -1,17 +1,30 @@
-## Reporting a Vulnerability
+# Beveiligingsbeleid
 
-**Do not open a public GitHub issue for security vulnerabilities.**
+## Ondersteunde versies
 
-Report privately via [GitHub Security Advisories](https://github.com/Stensel8/bypassnro/security/advisories/new).
+Alleen `main` wordt ondersteund. Er is geen releasehistorie om bij te houden;
+wat op `main` staat is de actuele staat.
 
-Include:
-- Description of the vulnerability
-- Steps to reproduce
-- Potential impact
-- Suggested fix (if any)
+## Een kwetsbaarheid melden
 
-You will receive a response within 7 days. If the report is accepted, a fix will be released as soon as possible and you will be credited in the release notes.
+Vind je een beveiligingsprobleem, meld het dan privé in plaats van via een
+openbaar issue.
 
-### Out of scope
+Gebruik daarvoor GitHubs [private vulnerability reporting](https://github.com/Thectic-NL/BypassNRO/security/advisories/new)
+voor deze repository. Je krijgt binnen enkele werkdagen een eerste reactie.
 
-By design, `unattend.xml` creates accounts without a password and auto-logs in once, and the one-liner downloads and runs a remote script. These are documented in the README, not vulnerabilities.
+Kan dat niet, of gaat het om iets dat breder speelt dan deze repository:
+
+- **E-mail:** <info@thectic.nl>
+- **PGP-sleutel:** <https://thectic.nl/.well-known/openpgpkey/hu/mg6owx9w8c3ejg3tu31f4tha5n17d4rj>
+
+De ondertekende, canonieke contactgegevens staan in
+[security.txt](https://thectic.nl/.well-known/security.txt).
+
+Meld kwetsbaarheden in software van derden niet hier maar bij het project zelf.
+
+## Buiten scope
+
+`unattend.xml` maakt bewust accounts zonder wachtwoord aan en meldt eenmalig
+automatisch aan, en de one-liner downloadt en draait een script van afstand.
+Dit staat zo in de documentatie beschreven en is geen kwetsbaarheid.
