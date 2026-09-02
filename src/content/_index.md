@@ -20,6 +20,10 @@ toc: false
   <span>Download script</span>
   {{< icon name="download" attributes="height=20" >}}
 {{< /hextra/hero-badge >}}
+{{< hextra/hero-badge link="https://bypassnro.thectic.nl/unattend.xml" >}}
+  <span>Download answer file</span>
+  {{< icon name="download" attributes="height=20" >}}
+{{< /hextra/hero-badge >}}
 </div>
 
 <div class="hx-mt-6"></div>
@@ -27,8 +31,8 @@ toc: false
 ## File Checksums
 
 **SHA256:**
-- `bypass.ps1`: `bd418a953d1550bec7660f7de4508ad9b306666fc352f068368d331a1e074593`
-- `unattend.xml`: `a7bdc3c7ee9046ddaf8caf9b198c915d7ad5b55814a5fccbcf07ca4480b8b877`
+- `bypass.ps1`: `8b3228d0f48c42358829425c6ee9414bbe0ea75c3da14e8d5a84ceb805367059`
+- `unattend.xml`: `f9420180589c986a8315445a2c3b999ef74d62100999d5a68b17e330e9a890c0`
 
 Verify with: `sha256sum bypass.ps1 unattend.xml`
 
