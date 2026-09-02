@@ -55,10 +55,6 @@ iex(irm bypassnro.thectic.nl/bypass.ps1)
 & ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1))) -NoReboot   # shut down instead
 ```
 
-## Without Sysprep (faster)
-
-Save [`unattend.xml`](https://bypassnro.thectic.nl/unattend.xml) to the root of the Windows 11 USB as `autounattend.xml`. Setup reads it during installation, so OOBE never asks for an account and there is no second reboot.
-
 ## Accounts
 
 The unattend.xml creates `Admin` (Administrators) and `User` (Users), both **without a password**, and signs `Admin` in automatically once. Set a password right after first logon.
