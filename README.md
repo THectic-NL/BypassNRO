@@ -6,7 +6,7 @@ Since March 2025, Microsoft's `oobe\bypassnro` command has been removed from Win
 
 The **BypassNRO method in this project still works** because it uses Sysprep with a custom unattend.xml. This approach remains functional for now, because unattend.xml is part of Windows' official enterprise deployment tools and cannot easily be blocked by Microsoft without breaking enterprise scenarios.
 
-Rufus, and on Pro/Enterprise "Set up for work or school" > "Sign-in options" > "Domain join instead", also still reach a local account.
+Rufus, and on Pro/Enterprise "Set up for work or school" > "Sign-in options" > "Domain join instead", also still has the ability to create a local account.
 
 **Timeline:**
 - Removal of `oobe\bypassnro`: March 2025
