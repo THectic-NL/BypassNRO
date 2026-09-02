@@ -1,9 +1,15 @@
+# Hugo
+/src/public/
+/src/resources/
+/src/_vendor/
+src/.hugo_build.lock
+
 # Dependencies
 node_modules/
 
-# Hugo
-public/
-.hugo_build.lock
+# Tooling
+/.claude
+__pycache__/
 
 # IDE
 .idea/

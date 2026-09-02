@@ -1,47 +1,64 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-#
-# https://github.com/microsoft/action-psscriptanalyzer
-# For more information on PSScriptAnalyzer in general, see
-# https://github.com/PowerShell/PSScriptAnalyzer
-
+# Copyright (C) 2026 Sten Tijhuis
+# SPDX-License-Identifier: MIT
 name: PSScriptAnalyzer
+
+# bypass.ps1 is de kern van deze repository, dus de PowerShell-lint houdt een
+# eigen workflow -- de andere Thectic-repo's hebben geen PowerShell om naast te
+# zetten. Instellingen staan in .github/PSScriptAnalyzerSettings.psd1.
+#
+# microsoft/psscriptanalyzer-action is niet door GitHub gecertificeerd en kent
+# geen versietags; hij staat op een vastgezette commit-SHA.
 
 on:
   push:
-    branches: [ "main", "hugo" ]
+    branches: [main]
+    paths:
+      - '**/*.ps1'
+      - '**/*.psm1'
+      - '**/*.psd1'
+      - '.github/workflows/powershell.yml'
   pull_request:
-    branches: [ "main", "hugo" ]
+    branches: [main]
+    paths:
+      - '**/*.ps1'
+      - '**/*.psm1'
+      - '**/*.psd1'
+      - '.github/workflows/powershell.yml'
   schedule:
     - cron: '43 19 * * 3'
+  workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
+
+concurrency:
+  group: powershell-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  build:
-    permissions:
-      contents: read # for actions/checkout to fetch code
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+  psscriptanalyzer:
     name: PSScriptAnalyzer
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Voor de SARIF-upload naar het Security-tabblad.
+      security-events: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Check out source code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Run PSScriptAnalyzer
-        uses: microsoft/psscriptanalyzer-action@6b2948b1944407914a58661c49941824d149734f
+        uses: microsoft/psscriptanalyzer-action@6b2948b1944407914a58661c49941824d149734f # v1.1
         with:
-          # Check https://github.com/microsoft/action-psscriptanalyzer for more info about the options.
           path: .\
           recurse: true
           settings: .github/PSScriptAnalyzerSettings.psd1
           output: results.sarif
 
-      # Upload the SARIF file generated in the previous step
       - name: Upload SARIF results file
-        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        if: ${{ !cancelled() }}
         with:
           sarif_file: results.sarif
+          category: psscriptanalyzer
