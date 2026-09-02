@@ -76,3 +76,7 @@ The unattend.xml creates `Admin` (Administrators) and `User` (Users), both **wit
 Only the `oobeSystem` pass applies. `Sysprep /oobe` without `/generalize` does not re-run `specialize`, so anything placed there is ignored. For debloating and tweaks use [WinDeploy](https://github.com/Stensel8/WinDeploy) or [WinUtil](https://github.com/ChrisTitusTech/winutil).
 
 Troubleshooting: Sysprep logs to `C:\Windows\System32\Sysprep\Panther\setuperr.log`.
+
+## Credits
+
+The `unattend.xml` here leans heavily on Christoph Schneegans' [unattend.xml generator](https://schneegans.de/windows/unattend-generator/), a thorough and well-documented tool for building Windows answer files. We cribbed from it and learned a lot in the process. To customise the answer file beyond what this project ships, start there.
