@@ -52,7 +52,7 @@
 
 [CmdletBinding()]
 param(
-    [string]$UnattendUrl = 'https://raw.githubusercontent.com/Thectic-NL/BypassNRO/main/unattend.xml',
+    [string]$UnattendUrl = 'https://raw.githubusercontent.com/Stensel8/bypassnro/main/unattend.xml',
     [string]$Destination = 'C:\Windows\Panther\unattend.xml',
     [switch]$Force,
     [switch]$NoReboot

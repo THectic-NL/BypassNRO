@@ -14,9 +14,15 @@ public/
 # OS
 .DS_Store
 Thumbs.db
+$RECYCLE.BIN/
+desktop.ini
 
 # Logs
 *.log
+
+# Local test output
+*.bak
+*.bak-*
 
 # Environment
 .env

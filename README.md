@@ -16,23 +16,23 @@ Rufus, and on Pro/Enterprise "Set up for work or school" > "Sign-in options" > "
 
 ### PowerShell
 ```powershell
-iex(irm bypassnro.thectic.nl)
+iex(irm bypassnro.thectic.nl/bypass.ps1)
 ```
 
 ### CMD Wrapper
 ```powershell
-powershell -c "iex(irm bypassnro.thectic.nl)"
+powershell -c "iex(irm bypassnro.thectic.nl/bypass.ps1)"
 ```
 
 `iex` cannot pass parameters. Use a script block for those:
 ```powershell
-& ([scriptblock]::Create((irm bypassnro.thectic.nl))) -Force      # skip confirmation
-& ([scriptblock]::Create((irm bypassnro.thectic.nl))) -NoReboot   # shut down instead
+& ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1))) -Force      # skip confirmation
+& ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1))) -NoReboot   # shut down instead
 ```
 
 ## Without Sysprep (faster)
 
-Save [`unattend.xml`](unattend.xml) to the root of the Windows 11 USB as `autounattend.xml`. Setup reads it during installation, so OOBE never asks for an account and there is no second reboot.
+Save [`unattend.xml`](https://bypassnro.thectic.nl/unattend.xml) to the root of the Windows 11 USB as `autounattend.xml`. Setup reads it during installation, so OOBE never asks for an account and there is no second reboot.
 
 ## Accounts
 
