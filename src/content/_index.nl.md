@@ -73,7 +73,7 @@ De unattend.xml maakt `Admin` (Administrators) en `User` (Users) aan, beide **zo
 
 ## Opmerkingen
 
-Alleen de `oobeSystem`-pass wordt toegepast. `Sysprep /oobe` zonder `/generalize` draait `specialize` niet opnieuw, dus alles wat daar staat wordt genegeerd. Gebruik voor debloaten en tweaks [WinDeploy](https://github.com/Stensel8/WinDeploy) of [WinUtil](https://github.com/ChrisTitusTech/winutil).
+Alleen de `oobeSystem`-pass wordt toegepast. `Sysprep /oobe` zonder `/generalize` draait `specialize` niet opnieuw, dus alles wat daar staat wordt genegeerd. Gebruik voor debloaten en tweaks [WinDeploy](https://github.com/Thectic-NL/WinDeploy) of [WinUtil](https://github.com/ChrisTitusTech/winutil).
 
 Problemen oplossen: Sysprep logt naar `C:\Windows\System32\Sysprep\Panther\setuperr.log`.
 
