@@ -29,7 +29,7 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/).
 
 **Examples:**
 ```
-feat: add autounattend.xml install path
+feat: show SHA256 checksums before applying the answer file
 fix: correct Sysprep flag in bypass.ps1
 content: update timeline with 25H2 retail status
 chore: upgrade Hextra theme

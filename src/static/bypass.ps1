@@ -1,62 +1,36 @@
 <#
 .SYNOPSIS
-    Sets up Windows 11 with a local account by applying an unattend.xml through Sysprep.
+    Sets up Windows 11 with a local account, without a Microsoft account.
 
 .DESCRIPTION
-    Downloads an answer file from this repository, writes it to
+    Downloads unattend.xml from bypassnro.thectic.nl, writes it to
     C:\Windows\Panther\unattend.xml and runs:
 
-        Sysprep.exe /oobe /unattend:<path> /reboot
+        Sysprep.exe /oobe /unattend:C:\Windows\Panther\unattend.xml /reboot
 
-    On the next boot, OOBE processes the answer file's oobeSystem pass, which
-    creates local accounts and skips the Microsoft-account sign-in screens.
+    The computer restarts and goes back through OOBE. This time OOBE reads the
+    answer file, creates the local accounts Admin and User, and never asks for
+    a Microsoft account.
 
     Unlike `oobe\bypassnro` (removed in March 2025) and `ms-cxh:localonly`
     (blocked from October 2025), unattend.xml is part of Windows' supported
-    deployment tooling, so it is not something Microsoft can remove without
-    breaking enterprise imaging.
-
-.PARAMETER UnattendUrl
-    Answer file to download. Defaults to the copy in this repository.
-
-.PARAMETER Destination
-    Where to write the answer file. Defaults to C:\Windows\Panther\unattend.xml.
-
-.PARAMETER Force
-    Skip the confirmation prompt.
-
-.PARAMETER NoReboot
-    Run Sysprep with /shutdown instead of /reboot.
+    deployment tooling, so Microsoft cannot remove it without breaking
+    enterprise imaging.
 
 .EXAMPLE
-    & ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1)))
+    iex(irm bypassnro.thectic.nl/bypass.ps1)
 
-    Run from an elevated prompt (Shift+F10 during OOBE gives you one).
-    See the README for the shorter pipe-to-execute one-liner.
-
-.EXAMPLE
-    & ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1))) -Force
-
-    Same, without the confirmation prompt. The short one-liner form cannot pass
-    parameters, so use a script block when you need them.
+    Press Shift+F10 during OOBE for an elevated prompt, then run this.
 
 .NOTES
-    Requires elevation. Designed for Windows PowerShell 5.1, which is what
-    Shift+F10 gives you during OOBE.
+    Requires elevation and Windows PowerShell 5.1, which is what Shift+F10
+    gives you during OOBE.
 
-    THIS REBOOTS THE MACHINE and sends it back through OOBE. Any work in
-    progress is lost.
+    THIS RESTARTS THE COMPUTER and sends it back through OOBE. Anything
+    unsaved is lost.
 #>
 
 #Requires -Version 5.1
-
-[CmdletBinding()]
-param(
-    [string]$UnattendUrl = 'https://bypassnro.thectic.nl/unattend.xml',
-    [string]$Destination = 'C:\Windows\Panther\unattend.xml',
-    [switch]$Force,
-    [switch]$NoReboot
-)
 
 $ErrorActionPreference = 'Stop'
 
@@ -64,125 +38,145 @@ $ErrorActionPreference = 'Stop'
 # Windows PowerShell, and it renders badly in the OOBE console.
 $ProgressPreference = 'SilentlyContinue'
 
-function Assert-Elevation {
-    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = [Security.Principal.WindowsPrincipal]$identity
-    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        Write-Error 'This script must be run elevated (as Administrator). Exiting.'
-        exit 1
-    }
+# No TLS version is pinned on purpose: Windows 11 already negotiates TLS 1.2/1.3
+# through SystemDefault, and hardcoding one stops the OS from picking something
+# better later.
+
+$site        = 'https://bypassnro.thectic.nl/'
+$scriptUrl   = 'https://bypassnro.thectic.nl/bypass.ps1'
+$unattendUrl = 'https://bypassnro.thectic.nl/unattend.xml'
+$destination = 'C:\Windows\Panther\unattend.xml'
+
+Write-Host ''
+Write-Host '  BypassNRO - local account setup for Windows 11' -ForegroundColor Cyan
+Write-Host '  ---------------------------------------------' -ForegroundColor Cyan
+Write-Host ''
+
+# --- Elevation --------------------------------------------------------------
+
+$identity  = [Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = [Security.Principal.WindowsPrincipal]$identity
+if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host '  This script must run as Administrator.' -ForegroundColor Red
+    Write-Host '  The console you get with Shift+F10 during OOBE is already elevated.' -ForegroundColor Red
+    Write-Host ''
+    return
 }
 
-function Save-Unattend {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)][string]$Url,
-        [Parameter(Mandatory = $true)][string]$OutPath
-    )
+# --- Download ---------------------------------------------------------------
 
-    $dir = Split-Path -Path $OutPath -Parent
-    if (-not (Test-Path -Path $dir)) {
-        New-Item -Path $dir -ItemType Directory -Force | Out-Null
-    }
+# Download to a temporary folder first, so a failed or truncated transfer cannot
+# leave a broken answer file behind in C:\Windows\Panther.
+$temp = Join-Path ([IO.Path]::GetTempPath()) ('bypassnro-{0}' -f [guid]::NewGuid())
+New-Item -Path $temp -ItemType Directory -Force | Out-Null
 
-    # Download to a temporary file first, so a failed or truncated transfer
-    # cannot leave a broken answer file in C:\Windows\Panther.
-    $temp = Join-Path ([System.IO.Path]::GetTempPath()) ("unattend-{0}.xml" -f [guid]::NewGuid())
+$answerFile = Join-Path $temp 'unattend.xml'
+$scriptCopy = Join-Path $temp 'bypass.ps1'
 
-    Write-Host "Downloading answer file from: $Url" -ForegroundColor Cyan
-    try {
-        Invoke-WebRequest -Uri $Url -UseBasicParsing -OutFile $temp -ErrorAction Stop
-    } catch {
-        Write-Warning "Invoke-WebRequest failed: $($_.Exception.Message). Trying Start-BitsTransfer..."
-        try {
-            Start-BitsTransfer -Source $Url -Destination $temp -ErrorAction Stop
-        } catch {
-            Write-Error "Failed to download $Url - $($_.Exception.Message)"
-            exit 2
-        }
-    }
-
-    if (-not (Test-Path -Path $temp)) {
-        Write-Error "Download reported success but no file was written to $temp"
-        exit 3
-    }
-
-    # Make sure we got XML and not a captive-portal page or a GitHub error.
-    try {
-        $xml = New-Object System.Xml.XmlDocument
-        $xml.Load($temp)
-        if ($xml.DocumentElement.LocalName -ne 'unattend') {
-            throw "root element is <$($xml.DocumentElement.LocalName)>, expected <unattend>"
-        }
-    } catch {
-        Remove-Item -LiteralPath $temp -Force -ErrorAction SilentlyContinue
-        Write-Error "Downloaded file is not a valid unattend answer file: $($_.Exception.Message)"
-        exit 3
-    }
-
-    # Keep whatever was there before; Windows may already have an answer file.
-    if (Test-Path -LiteralPath $OutPath) {
-        $backup = "$OutPath.bak-{0}" -f (Get-Date -Format 'yyyyMMdd-HHmmss')
-        Copy-Item -LiteralPath $OutPath -Destination $backup -Force -ErrorAction SilentlyContinue
-        Write-Host "Existing answer file backed up to $backup" -ForegroundColor DarkGray
-    }
-
-    Move-Item -LiteralPath $temp -Destination $OutPath -Force
+Write-Host "  Downloading unattend.xml and bypass.ps1 from $site" -ForegroundColor Cyan
+try {
+    # bypass.ps1 is downloaded a second time purely so its checksum can be shown
+    # below; only unattend.xml is used for anything.
+    Invoke-WebRequest -Uri $unattendUrl -OutFile $answerFile -UseBasicParsing
+    Invoke-WebRequest -Uri $scriptUrl -OutFile $scriptCopy -UseBasicParsing
+} catch {
+    Write-Host ''
+    Write-Host "  Download failed: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host '  Check the network connection and try again. Nothing was changed.' -ForegroundColor Red
+    Write-Host ''
+    Remove-Item -LiteralPath $temp -Recurse -Force -ErrorAction SilentlyContinue
+    return
 }
 
-function Start-Sysprep {
-    [CmdletBinding(SupportsShouldProcess = $true)]
-    param(
-        [Parameter(Mandatory = $true)][string]$UnattendPath,
-        [switch]$Shutdown
-    )
-
-    $sysprep = Join-Path -Path $env:SystemRoot -ChildPath 'System32\Sysprep\Sysprep.exe'
-    if (-not (Test-Path -Path $sysprep)) {
-        Write-Error "Sysprep not found at $sysprep"
-        exit 4
+# Make sure this really is the answer file and not a captive-portal login page
+# or a server error page.
+try {
+    $xml = New-Object System.Xml.XmlDocument
+    $xml.Load($answerFile)
+    if ($xml.DocumentElement.LocalName -ne 'unattend') {
+        throw "its root element is <$($xml.DocumentElement.LocalName)>, expected <unattend>"
     }
-
-    $finish = if ($Shutdown) { '/shutdown' } else { '/reboot' }
-    $argumentList = @('/oobe', "/unattend:`"$UnattendPath`"", $finish)
-
-    Write-Host "Running: $sysprep $($argumentList -join ' ')" -ForegroundColor Yellow
-    if (-not $PSCmdlet.ShouldProcess($env:COMPUTERNAME, "Run Sysprep /oobe $finish")) {
-        return
-    }
-
-    $proc = Start-Process -FilePath $sysprep -ArgumentList $argumentList -Wait -PassThru
-
-    # Sysprep restarts the machine itself, so a non-zero code here means it
-    # refused to run - check C:\Windows\System32\Sysprep\Panther\setuperr.log.
-    if ($proc.ExitCode -ne 0) {
-        Write-Error "Sysprep exited with code $($proc.ExitCode). See C:\Windows\System32\Sysprep\Panther\setuperr.log"
-        exit $proc.ExitCode
-    }
+} catch {
+    Write-Host ''
+    Write-Host "  The downloaded unattend.xml is not a Windows answer file: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host '  Nothing was changed. Try again, or download the file manually from' -ForegroundColor Red
+    Write-Host "  $site" -ForegroundColor Red
+    Write-Host ''
+    Remove-Item -LiteralPath $temp -Recurse -Force -ErrorAction SilentlyContinue
+    return
 }
 
-Assert-Elevation
+# --- Checksums --------------------------------------------------------------
 
-# No TLS version is pinned here on purpose. Windows 11 (the only supported
-# target) already negotiates TLS 1.2/1.3 through SystemDefault, and hardcoding
-# a version stops the OS handing us a better protocol later. Pinning is only
-# needed on Windows 7/8.1-era images, which this script does not support.
+$scriptHash   = (Get-FileHash -LiteralPath $scriptCopy -Algorithm SHA256).Hash.ToLower()
+$unattendHash = (Get-FileHash -LiteralPath $answerFile -Algorithm SHA256).Hash.ToLower()
 
-if (-not $Force) {
-    Write-Host ""
-    Write-Host "This will run Sysprep and $(if ($NoReboot) { 'shut down' } else { 'restart' }) the computer." -ForegroundColor Yellow
-    Write-Host "Windows will go back through OOBE and create the local accounts" -ForegroundColor Yellow
-    Write-Host "defined in the answer file. Anything unsaved will be lost." -ForegroundColor Yellow
-    Write-Host ""
-    $answer = Read-Host "Continue? [y/N]"
-    if ($answer -notmatch '^(y|yes)$') {
-        Write-Host "Cancelled. Nothing was changed." -ForegroundColor Cyan
-        exit 0
-    }
+Write-Host ''
+Write-Host '  CHECK THIS FIRST - SHA256 of the downloaded files:' -ForegroundColor Yellow
+Write-Host ''
+Write-Host '    bypass.ps1    ' -NoNewline
+Write-Host $scriptHash -ForegroundColor White
+Write-Host '    unattend.xml  ' -NoNewline
+Write-Host $unattendHash -ForegroundColor White
+Write-Host ''
+Write-Host "  Compare both values with the checksums published on $site" -ForegroundColor Yellow
+Write-Host '  If either one differs, answer n below and do not continue.' -ForegroundColor Yellow
+
+# --- Confirmation -----------------------------------------------------------
+
+Write-Host ''
+Write-Host '  What happens when you continue:' -ForegroundColor Yellow
+Write-Host ''
+Write-Host "    1. unattend.xml is copied to $destination"
+Write-Host '    2. Sysprep runs and RESTARTS this computer into OOBE'
+Write-Host '    3. OOBE reads the answer file and creates two local accounts:'
+Write-Host ''
+Write-Host '         Admin   administrator, NO password, signed in automatically once'
+Write-Host '         User    standard user, NO password'
+Write-Host ''
+Write-Host '       Those are the exact account names. OOBE no longer asks for a'
+Write-Host '       Microsoft account, a name, or a password.'
+Write-Host '    4. Give both accounts a password right after the first sign-in.'
+Write-Host ''
+Write-Host '  Anything unsaved on this computer is lost when it restarts.' -ForegroundColor Yellow
+Write-Host ''
+
+$answer = Read-Host '  Continue? [y/N]'
+if ($answer -notmatch '^\s*(y|yes)\s*$') {
+    Write-Host ''
+    Write-Host '  Cancelled. Nothing was changed.' -ForegroundColor Cyan
+    Write-Host ''
+    Remove-Item -LiteralPath $temp -Recurse -Force -ErrorAction SilentlyContinue
+    return
 }
 
-Write-Host "Using destination: $Destination" -ForegroundColor Green
-Save-Unattend -Url $UnattendUrl -OutPath $Destination
-Write-Host "Answer file saved to $Destination" -ForegroundColor Green
+# --- Apply ------------------------------------------------------------------
 
-Start-Sysprep -UnattendPath $Destination -Shutdown:$NoReboot
+$panther = Split-Path -Path $destination -Parent
+if (-not (Test-Path -LiteralPath $panther)) {
+    New-Item -Path $panther -ItemType Directory -Force | Out-Null
+}
+Copy-Item -LiteralPath $answerFile -Destination $destination -Force
+Remove-Item -LiteralPath $temp -Recurse -Force -ErrorAction SilentlyContinue
+
+Write-Host ''
+Write-Host "  Answer file written to $destination" -ForegroundColor Green
+Write-Host '  Running Sysprep. The computer restarts on its own - this can take a minute.' -ForegroundColor Green
+Write-Host ''
+
+$sysprep = Join-Path $env:SystemRoot 'System32\Sysprep\Sysprep.exe'
+try {
+    $proc = Start-Process -FilePath $sysprep -ArgumentList '/oobe', "/unattend:`"$destination`"", '/reboot' -Wait -PassThru
+} catch {
+    Write-Host "  Could not start Sysprep ($sysprep): $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host ''
+    return
+}
+
+# Sysprep restarts the machine itself, so reaching this point with a non-zero
+# exit code means it refused to run.
+if ($proc.ExitCode -ne 0) {
+    Write-Host "  Sysprep stopped with exit code $($proc.ExitCode) and the computer will not restart." -ForegroundColor Red
+    Write-Host '  The reason is logged in C:\Windows\System32\Sysprep\Panther\setuperr.log' -ForegroundColor Red
+    Write-Host ''
+}

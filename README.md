@@ -1,45 +1,74 @@
 # Bypass NRO
 
-## Status of Bypass Methods (August 2026)
+Set up Windows 11 with a **local account**, without a Microsoft account.
 
-Since March 2025, Microsoft's `oobe\bypassnro` command has been removed from Windows 11 (24H2/25H2). The alternative `start ms-cxh:localonly` (and `start ms-cxh://setaddlocalonly`) was blocked starting with Insider build 26220.6772 (October 6, 2025). Whether that block reached the retail 25H2 branch (26200.x) has not been re-tested here, so check your own image before relying on it.
+Press **Shift+F10** during Windows setup (OOBE) to open a command prompt, then run:
 
-The **BypassNRO method in this project still works** because it uses Sysprep with a custom unattend.xml. This approach remains functional for now, because unattend.xml is part of Windows' official enterprise deployment tools and cannot easily be blocked by Microsoft without breaking enterprise scenarios.
-
-Rufus, and on Pro/Enterprise "Set up for work or school" > "Sign-in options" > "Domain join instead", can still be used to create a local account.
-
-**Timeline:**
-- Removal of `oobe\bypassnro`: March 2025
-- Blocking of `ms-cxh:localonly`: October 6, 2025 (Insider builds 26220.6772 / 26120.6772)
-
-## Download and Run (Shift+F10 during OOBE)
-
-### PowerShell
 ```powershell
 iex(irm bypassnro.thectic.nl/bypass.ps1)
 ```
 
-### CMD Wrapper
-```powershell
-powershell -c "iex(irm bypassnro.thectic.nl/bypass.ps1)"
-```
+That is the whole thing. There are no options or parameters.
 
-`iex` cannot pass parameters. Use a script block for those:
-```powershell
-& ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1))) -Force      # skip confirmation
-& ([scriptblock]::Create((irm bypassnro.thectic.nl/bypass.ps1))) -NoReboot   # shut down instead
-```
+## Status
 
-## Without Sysprep (faster)
+- **Last tested:** 19 September 2026
+- **Windows build:** 26200.9457 (Windows 11 25H2)
+- **Result:** works
 
-Save [`unattend.xml`](https://bypassnro.thectic.nl/unattend.xml) to the root of the Windows 11 USB as `autounattend.xml`. Setup reads it during installation, so OOBE never asks for an account and there is no second reboot.
+It looks like this still works on 26H2 as well.
 
-## Accounts
+The reason it keeps working: Sysprep and `unattend.xml` are part of Windows' own
+enterprise deployment tooling, so Microsoft cannot remove them without breaking
+corporate imaging. The older tricks had no such protection:
 
-`unattend.xml` creates `Admin` (Administrators) and `User` (Users), both **without a password**, and signs `Admin` in automatically once. Set a password right after first logon.
+| Date | Event |
+|------|-------|
+| March 2025 | `oobe\bypassnro` removed from Windows 11 (24H2/25H2) |
+| 6 October 2025 | `start ms-cxh:localonly` blocked from Insider builds 26220.6772 / 26120.6772 |
+| 19 September 2026 | This Sysprep method still works on 26200.9457 |
+
+## Check before you run it
+
+The script prints the SHA256 of both files it downloads and waits for you to
+confirm. Compare those two values with the checksums published on
+<https://bypassnro.thectic.nl/> before answering `y`. If either one differs,
+answer `n` — nothing has been changed at that point.
+
+## What it does
+
+1. Downloads [`unattend.xml`](https://bypassnro.thectic.nl/unattend.xml) and writes it to `C:\Windows\Panther\unattend.xml`
+2. Runs `Sysprep.exe /oobe /unattend:C:\Windows\Panther\unattend.xml /reboot`
+3. The computer restarts into OOBE, which reads the answer file and creates the accounts below
+
+Anything unsaved on the machine is lost at the restart.
+
+## Accounts it creates
+
+| Account | Group | Password | Notes |
+|---------|-------|----------|-------|
+| `Admin` | Administrators | none | Signed in automatically once, after that autologon is switched off |
+| `User` | Users | none | Standard user |
+
+Those are the literal account names. OOBE never asks for a Microsoft account, a
+user name or a password, so **give both accounts a password right after the
+first sign-in**.
+
+## Troubleshooting
+
+If the computer does not restart, Sysprep logs the reason to
+`C:\Windows\System32\Sysprep\Panther\setuperr.log`.
+
+The script must run elevated. The console you get with Shift+F10 during OOBE
+already is.
 
 ## Notes
 
-Only the `oobeSystem` pass applies. `Sysprep /oobe` without `/generalize` does not re-run `specialize`, so anything placed there is ignored. For debloating and tweaks use [WinDeploy](https://github.com/Thectic-NL/WinDeploy) or [WinUtil](https://github.com/ChrisTitusTech/winutil).
+Only the `oobeSystem` pass of the answer file applies: `Sysprep /oobe` without
+`/generalize` does not re-run `specialize`, so anything placed there is ignored.
+For debloating and tweaks use [WinDeploy](https://github.com/Thectic-NL/WinDeploy)
+or [WinUtil](https://github.com/ChrisTitusTech/winutil).
 
-Troubleshooting: Sysprep logs to `C:\Windows\System32\Sysprep\Panther\setuperr.log`.
+The `unattend.xml` leans heavily on Christoph Schneegans'
+[unattend.xml generator](https://schneegans.de/windows/unattend-generator/). To
+customise the answer file beyond what this project ships, start there.
