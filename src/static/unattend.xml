@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  BypassNRO answer file - https://github.com/Thectic-NL/BypassNRO
+  BypassNRO answer file - https://bypassnro.thectic.nl/
 
-  Creates local accounts and skips the Microsoft-account sign-in screens
-  during OOBE. Works two ways:
+  Used by bypass.ps1, which writes it to C:\Windows\Panther\unattend.xml and
+  runs:
 
-    1. Sysprep (bypass.ps1)
-         Sysprep.exe /oobe /unattend:C:\Windows\Panther\unattend.xml /reboot
-       Only the oobeSystem pass is processed. The specialize pass is NOT
-       re-run without /generalize, which is why there is nothing in it.
+    Sysprep.exe /oobe /unattend:C:\Windows\Panther\unattend.xml /reboot
 
-    2. Installation media (recommended)
-       Rename to autounattend.xml and put it on the root of the Windows 11
-       USB. Setup picks it up automatically and both windowsPE and
-       oobeSystem are processed. This never reaches the account screen at
-       all, so there is nothing to bypass.
+  Only the oobeSystem pass is processed: Sysprep /oobe without /generalize does
+  not re-run specialize, so there is no point putting anything there. The
+  windowsPE pass below only applies when this file is renamed to
+  autounattend.xml and used from installation media.
 
-  WARNING: both accounts below are created WITHOUT A PASSWORD, and Admin is
-  logged on automatically once. Set a password immediately after first logon.
+  WARNING: both accounts are created WITHOUT A PASSWORD, and Admin is signed in
+  automatically once. Set a password immediately after the first sign-in.
 -->
 <unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
-	<settings pass="offlineServicing"></settings>
 	<settings pass="windowsPE">
 		<component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<UserData>
@@ -34,10 +29,6 @@
 			<UseConfigurationSet>false</UseConfigurationSet>
 		</component>
 	</settings>
-	<settings pass="generalize"></settings>
-	<settings pass="specialize"></settings>
-	<settings pass="auditSystem"></settings>
-	<settings pass="auditUser"></settings>
 	<settings pass="oobeSystem">
 		<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
 			<!--
