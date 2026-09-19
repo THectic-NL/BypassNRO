@@ -35,6 +35,13 @@ confirm. Compare those two values with the checksums published on
 <https://bypassnro.thectic.nl/> before answering `y`. If either one differs,
 answer `n` — nothing has been changed at that point.
 
+It also checks which account you are signed in as. Windows setup runs under a
+temporary account called `defaultuser0`, so that is who you are in the Shift+F10
+console. Anyone else means the computer is most likely already set up, and
+running Sysprep there sends the whole machine back through setup. In that case
+the script warns first and only goes on if you type `CONTINUE` — plain `y` is
+not enough.
+
 ## What it does
 
 1. Downloads [`unattend.xml`](https://bypassnro.thectic.nl/unattend.xml) and writes it to `C:\Windows\Panther\unattend.xml`

@@ -41,7 +41,7 @@ Dat is alles. Er zijn geen opties of parameters.
 ## Checksums
 
 **SHA256:**
-- `bypass.ps1`: `caab216b50f1e7e2f566a0d81158e410c484f7255bc5870bb1c009e9e5f1dcc9`
+- `bypass.ps1`: `323da784576c2744cb2981ff4f8d52ba836be0a6edb8ffa1fe05279cce292da1`
 - `unattend.xml`: `7c5d4eb9a9cfe03cb506c4189e3955ca5f36788131386f30f519d8e861c0ad1c`
 
 Het script toont de SHA256 van beide bestanden die het downloadt en wacht dan.
@@ -50,6 +50,17 @@ antwoordt. Wijkt er één af, antwoord dan `n` — op dat moment is er nog niets
 gewijzigd.
 
 Een zelf gedownload bestand controleer je zo: `Get-FileHash .\bypass.ps1 -Algorithm SHA256`
+
+## Als je niet in Windows Setup zit
+
+Het script kijkt ook onder welk account je bent aangemeld. Windows Setup draait
+onder een tijdelijk account met de naam `defaultuser0`, dus dat ben jij in de
+console van Shift+F10. Iedere andere naam betekent dat de computer waarschijnlijk
+al is ingericht, en Sysprep stuurt die machine dan volledig terug door Setup.
+
+In dat geval waarschuwt het script eerst en gaat het alleen verder als je
+`CONTINUE` typt. Een simpele `y` is niet genoeg, zodat één losse toetsaanslag
+geen werkende computer terugzet.
 
 {{< callout type="info" >}}
 **Status:** voor het laatst getest op **19 september 2026** op Windows 11 build **26200.9457** (25H2) — werkt nog steeds. Het lijkt erop dat dit ook in 26H2 nog werkt.

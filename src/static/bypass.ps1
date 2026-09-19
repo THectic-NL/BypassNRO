@@ -26,6 +26,10 @@
     Requires elevation and Windows PowerShell 5.1, which is what Shift+F10
     gives you during OOBE.
 
+    OOBE signs you in as defaultuser0. If the current account is anything else,
+    the computer is probably already set up, so the script warns and asks for an
+    extra confirmation before doing anything.
+
     THIS RESTARTS THE COMPUTER and sends it back through OOBE. Anything
     unsaved is lost.
 #>
@@ -61,6 +65,34 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
     Write-Host '  The console you get with Shift+F10 during OOBE is already elevated.' -ForegroundColor Red
     Write-Host ''
     return
+}
+
+# --- Are you actually in OOBE? ----------------------------------------------
+
+# Windows runs OOBE under a temporary account called defaultuser0, so that is
+# who you are in the console Shift+F10 opens. Any other account means this
+# computer is most likely already set up, and Sysprep would reset it.
+$currentUser = ($identity.Name -split '\\')[-1]
+if ($currentUser -ne 'defaultuser0') {
+    Write-Host '  WARNING - this does not look like Windows setup (OOBE).' -ForegroundColor Red
+    Write-Host ''
+    Write-Host "  You are signed in as '$currentUser'. During OOBE Windows signs you in" -ForegroundColor Red
+    Write-Host "  as 'defaultuser0', so this computer looks like it is already set up." -ForegroundColor Red
+    Write-Host ''
+    Write-Host '  Continuing means Sysprep sends this computer back through Windows' -ForegroundColor Red
+    Write-Host '  setup and restarts it. That cannot be undone from inside Windows.' -ForegroundColor Red
+    Write-Host ''
+    Write-Host '  Are you sure you want to continue?' -ForegroundColor Red
+    Write-Host ''
+
+    $sure = Read-Host '  Type CONTINUE to go on, anything else to stop'
+    if ($sure.Trim() -ne 'CONTINUE') {
+        Write-Host ''
+        Write-Host '  Cancelled. Nothing was changed.' -ForegroundColor Cyan
+        Write-Host ''
+        return
+    }
+    Write-Host ''
 }
 
 # --- Download ---------------------------------------------------------------

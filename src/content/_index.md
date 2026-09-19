@@ -41,7 +41,7 @@ That is the whole thing. There are no options or parameters.
 ## File checksums
 
 **SHA256:**
-- `bypass.ps1`: `caab216b50f1e7e2f566a0d81158e410c484f7255bc5870bb1c009e9e5f1dcc9`
+- `bypass.ps1`: `323da784576c2744cb2981ff4f8d52ba836be0a6edb8ffa1fe05279cce292da1`
 - `unattend.xml`: `7c5d4eb9a9cfe03cb506c4189e3955ca5f36788131386f30f519d8e861c0ad1c`
 
 The script prints the SHA256 of both files it downloads and then waits. Compare
@@ -49,6 +49,16 @@ the two values on screen with the two above before you answer `y`. If either one
 differs, answer `n` — nothing has been changed at that point.
 
 Checking a file you downloaded yourself: `Get-FileHash .\bypass.ps1 -Algorithm SHA256`
+
+## If you are not in Windows setup
+
+The script also checks which account you are signed in as. Windows setup runs
+under a temporary account called `defaultuser0`, so that is who you are in the
+Shift+F10 console. Anyone else means the computer is most likely already set up,
+and running Sysprep there sends the whole machine back through setup.
+
+In that case the script warns first and only goes on if you type `CONTINUE`.
+Plain `y` is not enough, so a stray keypress cannot reset a working computer.
 
 {{< callout type="info" >}}
 **Status:** last tested on **19 September 2026** on Windows 11 build **26200.9457** (25H2) — still works. It looks like this still works on 26H2 as well.
