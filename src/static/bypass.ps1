@@ -1,38 +1,12 @@
-<#
-.SYNOPSIS
-    Sets up Windows 11 with a local account, without a Microsoft account.
-
-.DESCRIPTION
-    Downloads unattend.xml from bypassnro.thectic.nl, writes it to
-    C:\Windows\Panther\unattend.xml and runs:
-
-        Sysprep.exe /oobe /unattend:C:\Windows\Panther\unattend.xml /reboot
-
-    The computer restarts and goes back through OOBE. This time OOBE reads the
-    answer file, creates the local accounts Admin and User, and never asks for
-    a Microsoft account.
-
-    Unlike `oobe\bypassnro` (removed in March 2025) and `ms-cxh:localonly`
-    (blocked from October 2025), unattend.xml is part of Windows' supported
-    deployment tooling, so Microsoft cannot remove it without breaking
-    enterprise imaging.
-
-.EXAMPLE
-    iex(irm bypassnro.thectic.nl/bypass.ps1)
-
-    Press Shift+F10 during OOBE for an elevated prompt, then run this.
-
-.NOTES
-    Requires elevation and Windows PowerShell 5.1, which is what Shift+F10
-    gives you during OOBE.
-
-    OOBE signs you in as defaultuser0. If the current account is anything else,
-    the computer is probably already set up, so the script warns and asks for an
-    extra confirmation before doing anything.
-
-    THIS RESTARTS THE COMPUTER and sends it back through OOBE. Anything
-    unsaved is lost.
-#>
+# BypassNRO - https://bypassnro.thectic.nl/
+#
+# Sets up Windows 11 with a local account instead of a Microsoft account.
+# Downloads unattend.xml, writes it to C:\Windows\Panther\unattend.xml and runs
+# Sysprep.exe /oobe /unattend:<file> /reboot. On the next boot OOBE reads the
+# answer file, creates the accounts Admin and User, and skips the account
+# screens.
+#
+# Run elevated during OOBE (Shift+F10). THIS RESTARTS THE COMPUTER.
 
 #Requires -Version 5.1
 

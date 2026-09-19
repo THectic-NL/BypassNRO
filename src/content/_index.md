@@ -41,7 +41,7 @@ That is the whole thing. There are no options or parameters.
 ## File checksums
 
 **SHA256:**
-- `bypass.ps1`: `323da784576c2744cb2981ff4f8d52ba836be0a6edb8ffa1fe05279cce292da1`
+- `bypass.ps1`: `f62461594526f4ed4b4d05a8c0dc435c444f0fa64d9b4560aa08ab77d7ed96ca`
 - `unattend.xml`: `7c5d4eb9a9cfe03cb506c4189e3955ca5f36788131386f30f519d8e861c0ad1c`
 
 The script prints the SHA256 of both files it downloads and then waits. Compare
