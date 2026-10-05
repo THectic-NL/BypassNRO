@@ -61,7 +61,7 @@ In that case the script warns first and only goes on if you type `CONTINUE`.
 Plain `y` is not enough, so a stray keypress cannot reset a working computer.
 
 {{< callout type="info" >}}
-**Status:** last tested on **19 September 2026** on Windows 11 build **26200.9457** (25H2) — still works. It looks like this still works on 26H2 as well.
+**Status:** last tested on **5 October 2026** on Windows 11 build **26300.9457** (26H2) — still works. It also worked on 25H2 (build 26200.9457, tested 19 September 2026).
 
 **Why this method keeps working:** Microsoft removed `oobe\bypassnro` from Windows 11 in March 2025, and blocked the alternative `start ms-cxh:localonly` from October 2025. Sysprep and `unattend.xml` are different: they are part of Windows' own enterprise deployment tooling, so they cannot be removed without breaking corporate imaging.
 
@@ -93,7 +93,8 @@ first sign-in**.
 |------|-------|
 | March 2025 | Microsoft removed `oobe\bypassnro` from Windows 11 (24H2/25H2) |
 | 6 October 2025 | `start ms-cxh:localonly` blocked from Insider builds 26220.6772 / 26120.6772 |
-| 19 September 2026 | This Sysprep method still works on build 26200.9457 |
+| 19 September 2026 | This Sysprep method still works on 25H2 build 26200.9457 |
+| 5 October 2026 | This Sysprep method still works on 26H2 build 26300.9457 |
 
 ## Troubleshooting
 

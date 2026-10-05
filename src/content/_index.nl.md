@@ -63,7 +63,7 @@ In dat geval waarschuwt het script eerst en gaat het alleen verder als je
 geen werkende computer terugzet.
 
 {{< callout type="info" >}}
-**Status:** voor het laatst getest op **19 september 2026** op Windows 11 build **26200.9457** (25H2) — werkt nog steeds. Het lijkt erop dat dit ook in 26H2 nog werkt.
+**Status:** voor het laatst getest op **5 oktober 2026** op Windows 11 build **26300.9457** (26H2) — werkt nog steeds. Het werkte ook op 25H2 (build 26200.9457, getest op 19 september 2026).
 
 **Waarom deze methode blijft werken:** Microsoft verwijderde `oobe\bypassnro` in maart 2025 uit Windows 11 en blokkeerde het alternatief `start ms-cxh:localonly` vanaf oktober 2025. Sysprep en `unattend.xml` zijn van een andere orde: ze horen bij Windows' eigen enterprise-deploymenttools en zijn niet te verwijderen zonder zakelijke imaging te breken.
 
@@ -95,7 +95,8 @@ accounts direct na de eerste aanmelding een wachtwoord**.
 |------|-------|
 | Maart 2025 | Microsoft verwijdert `oobe\bypassnro` uit Windows 11 (24H2/25H2) |
 | 6 oktober 2025 | `start ms-cxh:localonly` geblokkeerd vanaf Insider-builds 26220.6772 / 26120.6772 |
-| 19 september 2026 | Deze Sysprep-methode werkt nog steeds op build 26200.9457 |
+| 19 september 2026 | Deze Sysprep-methode werkt nog steeds op 25H2-build 26200.9457 |
+| 5 oktober 2026 | Deze Sysprep-methode werkt nog steeds op 26H2-build 26300.9457 |
 
 ## Problemen oplossen
 
