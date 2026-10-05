@@ -12,11 +12,11 @@ That is the whole thing. There are no options or parameters.
 
 ## Status
 
-- **Last tested:** 19 September 2026
-- **Windows build:** 26200.9457 (Windows 11 25H2)
+- **Last tested:** 5 October 2026
+- **Windows build:** 26300.9457 (Windows 11 26H2)
 - **Result:** works
 
-It looks like this still works on 26H2 as well.
+It also worked on 25H2 (build 26200.9457, tested 19 September 2026).
 
 The reason it keeps working: Sysprep and `unattend.xml` are part of Windows' own
 enterprise deployment tooling, so Microsoft cannot remove them without breaking
@@ -26,7 +26,8 @@ corporate imaging. The older tricks had no such protection:
 |------|-------|
 | March 2025 | `oobe\bypassnro` removed from Windows 11 (24H2/25H2) |
 | 6 October 2025 | `start ms-cxh:localonly` blocked from Insider builds 26220.6772 / 26120.6772 |
-| 19 September 2026 | This Sysprep method still works on 26200.9457 |
+| 19 September 2026 | This Sysprep method still works on 25H2 build 26200.9457 |
+| 5 October 2026 | This Sysprep method still works on 26H2 build 26300.9457 |
 
 ## Check before you run it
 
